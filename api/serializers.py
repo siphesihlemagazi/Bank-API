@@ -11,7 +11,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AccountSerializer(serializers.ModelSerializer):
-    holder = UserSerializer(read_only=True)
 
     def validate(self, data):
         if data['account_type'] == 'Savings':
@@ -24,6 +23,8 @@ class AccountSerializer(serializers.ModelSerializer):
                 raise ValidationError("A credit account cannot have less than -R20000")
             return data
 
+    holder = UserSerializer(read_only=True)
+
     class Meta:
         model = Account
         fields = ['id', 'holder', 'account_type', 'balance', 'date_created']
@@ -35,12 +36,23 @@ class TransactionSerializer(serializers.ModelSerializer):
         if data['transaction_type'] == 'Deposit':
             if data['amount'] < 0.1:
                 raise ValidationError("Deposit start at 0.1 cent")
+            else:
+                data['account'].deposit(data['amount'])
             return data
 
         if data['transaction_type'] == 'Withdrawal':
-            if data['amount'] > data['account.balance']:
-                raise ValidationError("You have insufficient funds")
-            return data
+            if data['account'].account_type == 'Credit':
+                if (data['account'].balance - data['amount']) < -20000:
+                    raise ValidationError("You have insufficient funds")
+                else:
+                    data['account'].withdrawal(data['amount'])
+                return data
+            if data['account'].account_type == 'Savings':
+                if (data['account'].balance - data['amount']) < 50:
+                    raise ValidationError("You have insufficient funds")
+                else:
+                    data['account'].withdrawal(data['amount'])
+                return data
 
     class Meta:
         model = Transaction

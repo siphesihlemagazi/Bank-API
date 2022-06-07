@@ -28,6 +28,22 @@ class Account(models.Model):
     def __str__(self):
         return f"{self.holder} - {self.balance}"
 
+    def deposit(self, amount):
+        if amount > 0.1:
+            self.balance = self.balance + amount
+            self.save()
+
+    def withdrawal(self, amount):
+        if self.account_type == 'Savings':
+            if (self.balance - amount) >= 50:
+                self.balance = self.balance - amount
+                self.save()
+
+        if self.account_type == 'Credit':
+            if (self.balance - amount) >= -20000:
+                self.balance = self.balance - amount
+                self.save()
+
 
 transaction_type = [('Deposit', 'Deposit'), ('Withdrawal', 'Withdrawal')]
 
@@ -38,10 +54,22 @@ class Transaction(models.Model):
         if self.transaction_type == 'Deposit':
             if self.amount < 0.1:
                 raise ValidationError("Deposit start at 0.1 cent")
+            else:
+                self.account.deposit(self.amount)
 
         if self.transaction_type == 'Withdrawal':
-            if self.amount > self.account.balance:
-                raise ValidationError("You have insufficient funds")
+
+            if self.account.account_type == 'Savings':
+                if (self.account.balance - self.amount) >= 50:
+                    self.account.withdrawal(self.amount)
+                else:
+                    raise ValidationError("You have insufficient funds")
+
+            if self.account.account_type == 'Credit':
+                if (self.account.balance - self.amount) >= -20000:
+                    self.account.withdrawal(self.amount)
+                else:
+                    raise ValidationError("You have insufficient funds")
 
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     transaction_type = models.CharField(max_length=25, choices=transaction_type)
