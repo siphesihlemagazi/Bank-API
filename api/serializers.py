@@ -23,11 +23,11 @@ class AccountSerializer(serializers.ModelSerializer):
                 raise ValidationError("A credit account cannot have less than -R20000")
             return data
 
-    holder = UserSerializer(read_only=True)
+    holder = UserSerializer()
 
     class Meta:
         model = Account
-        fields = ['id', 'holder', 'account_type', 'balance', 'date_created']
+        fields = '__all__'
 
 
 class TransactionSerializer(serializers.ModelSerializer):

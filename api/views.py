@@ -1,9 +1,10 @@
 from api.models import Account, Transaction
-from api.serializers import AccountSerializer, TransactionSerializer
+from api.serializers import AccountSerializer, TransactionSerializer, UserSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import generics
+from django.contrib.auth.models import User
 
 
 @api_view(["GET", "POST"])
@@ -54,3 +55,13 @@ class TransactionList(generics.ListCreateAPIView):
 class TransactionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
+
+
+class UserList(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
