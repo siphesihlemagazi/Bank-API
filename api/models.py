@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from datetime import datetime
+from .signals import *
 
 account_type = [('Savings', 'Savings'), ('Credit', 'Credit')]
 
@@ -26,7 +27,7 @@ class Account(models.Model):
         ordering = ['-date_created']
 
     def __str__(self):
-        return f"{self.holder} - {self.balance}"
+        return f"{self.holder.first_name} {self.holder.last_name} - {self.account_type}".title()
 
     def deposit(self, amount):
         if amount > 0.1:
@@ -80,4 +81,4 @@ class Transaction(models.Model):
         ordering = ['-date_created']
 
     def __str__(self):
-        return f"{self.transaction_type} - {self.date_created}"
+        return f"{self.account} {self.transaction_type} (R{self.amount})".title()

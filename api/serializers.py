@@ -5,9 +5,33 @@ from rest_framework.exceptions import ValidationError
 
 
 class UserSerializer(serializers.ModelSerializer):
+    def validate(self, data):
+        if data.get('first_name') is None:
+            raise ValidationError("First name cannot be blank")
+        elif data.get('last_name') is None:
+            raise ValidationError("Last name cannot be blank")
+        return data
+
+    password = serializers.CharField(write_only=True)
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name']
+        fields = ['id', 'username', 'first_name', 'last_name', 'password']
+
+    def create(self, validated_data):
+        user = super().create(validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
+    def update(self, instance, validated_data):
+        user = super().update(instance, validated_data)
+        try:
+            user.set_password(validated_data['password'])
+            user.save()
+        except KeyError:
+            pass
+        return user
 
 
 class AccountSerializer(serializers.ModelSerializer):
@@ -22,8 +46,6 @@ class AccountSerializer(serializers.ModelSerializer):
             if data['balance'] < -20000:
                 raise ValidationError("A credit account cannot have less than -R20000")
             return data
-
-    holder = UserSerializer(read_only=True)
 
     class Meta:
         model = Account
