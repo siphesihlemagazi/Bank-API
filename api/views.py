@@ -1,50 +1,22 @@
 from api.models import Account, Transaction
 from api.serializers import AccountSerializer, TransactionSerializer, UserSerializer
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import generics
 from django.contrib.auth.models import User
+from django.views import View
+from rest_framework import generics, status
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
+from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 
-@api_view(["GET", "POST"])
-def account_list(request):
-    if request.method == "GET":
-        materials = Account.objects.all()
-        serializer = AccountSerializer(materials, many=True)
-        return Response(serializer.data)
-
-    elif request.method == "POST":
-        serializer = AccountSerializer(data=request.data)
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class AccountList(generics.ListCreateAPIView):
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
 
 
-@api_view(["GET", "PUT", "DELETE"])
-def account_details(request, pk):
-    try:
-        account = Account.objects.get(pk=pk)
-
-    except Account.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == "GET":
-        serializer = AccountSerializer(account)
-        return Response(serializer.data)
-
-    elif request.method == "PUT":
-        serializer = AccountSerializer(account, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == "DELETE":
-        account.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+class AccountDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
 
 
 class TransactionList(generics.ListCreateAPIView):
@@ -58,6 +30,8 @@ class TransactionDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class UserList(generics.ListCreateAPIView):
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -65,3 +39,26 @@ class UserList(generics.ListCreateAPIView):
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+@api_view(["POST"])
+def user_registration(request):
+    if request.method == "POST":
+        serializer = UserSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserAccounts(generics.ListCreateAPIView):
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.Account.all()
+
+# authentication_classes = [TokenAuthentication]
+# permission_classes = [IsAuthenticated]
