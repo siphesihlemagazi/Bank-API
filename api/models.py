@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from datetime import datetime
+from .signals import *
 
 account_type = [('Savings', 'Savings'), ('Credit', 'Credit')]
 

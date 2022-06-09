@@ -5,6 +5,13 @@ from rest_framework.exceptions import ValidationError
 
 
 class UserSerializer(serializers.ModelSerializer):
+    def validate(self, data):
+        if data.get('first_name') is None:
+            raise ValidationError("First name cannot be blank")
+        elif data.get('last_name') is None:
+            raise ValidationError("Last name cannot be blank")
+        return data
+
     password = serializers.CharField(write_only=True)
 
     class Meta:

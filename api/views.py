@@ -1,44 +1,74 @@
 from api.models import Account, Transaction
 from api.serializers import AccountSerializer, TransactionSerializer, UserSerializer
-from django.contrib.auth.models import User
-from django.views import View
 from rest_framework import generics, status
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 
 class AccountList(generics.ListCreateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
+
+    def get_queryset(self):
+        queryset = Account.objects.all()
+        user_id = self.request.GET.get('user_id')
+
+        if user_id:
+            queryset = queryset.filter(holder__id=user_id)
+
+        return queryset
 
 
 class AccountDetail(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
 
+    def get_queryset(self):
+        queryset = Account.objects.all()
+        user_id = self.request.GET.get('user_id')
+
+        if user_id:
+            queryset = queryset.filter(holder__id=user_id)
+
+        return queryset
+
 
 class TransactionList(generics.ListCreateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
+
+    def get_queryset(self):
+        queryset = Account.objects.all()
+        user_id = self.request.GET.get('user_id')
+
+        if user_id:
+            queryset = queryset.filter(holder__id=user_id)
+
+        return queryset
 
 
 class TransactionDetail(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
 
+    def get_queryset(self):
+        queryset = Account.objects.all()
+        user_id = self.request.GET.get('user_id')
 
-class UserList(generics.ListCreateAPIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+        if user_id:
+            queryset = queryset.filter(holder__id=user_id)
 
-
-class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+        return queryset
 
 
 @api_view(["POST"])
@@ -52,13 +82,17 @@ def user_registration(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserAccounts(generics.ListCreateAPIView):
+class UserAccount(generics.ListCreateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     queryset = Account.objects.all()
-    serializer_class = AccountSerializer
+    serializer_class = AccountSerializer()
 
-    def get_queryset(self):
-        user = self.request.user
-        return user.Account.all()
+    def list(self, request):
+        queryset = self.get_queryset()
+        queryset = queryset.filter(holder=request.user)
+        serializer = AccountSerializer(queryset, many=True)
+        return Response(serializer.data)
 
-# authentication_classes = [TokenAuthentication]
-# permission_classes = [IsAuthenticated]
+
