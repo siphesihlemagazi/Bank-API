@@ -1,0 +1,31 @@
+Tests:
+
+1. Create user without including all fields:
+curl -X POST http://127.0.0.1:13000/register/ -d '{"username": "janedoe", "password": "2020flex"}' -H "Content-Type: application/json"
+
+
+2. Get user authorization token for a non existing user:
+curl -X POST -d '{"username": "randomusername","password": "randompassword"}' -H 'Content-Type: application/json'  http://127.0.0.1:13000/api-token-auth/
+
+
+3. Login user without including token:
+curl -X GET http://127.0.0.1:13000/api-auth/login/'
+
+
+4. List all users as non admin:
+curl -X GET http://127.0.0.1:13000/users/ -H 'Authorization: Token some user token'
+
+
+5. Open account as non admin:
+curl -X POST http://127.0.0.1:13000/accounts/ -d '{"holder": 45, "account_type": "Credit", "balance": -1000}' -H 'Content-Type: application/json' -H 'Authorization: Token d934874c3ca9be2d3105c7d08762d8dfc0a31c88'
+
+6. List account for a non existing user id, using admin access:
+curl -X GET http://127.0.0.1:13000/accounts/?user_id=45 -H 'Authorization: Token d934874c3ca9be2d3105c7d08762d8dfc0a31c88'
+
+
+7. Withdraw all money from Savings account:
+curl -X POST http://127.0.0.1:13000/transactions/ -d '{"account": 8, "transaction_type": "Withdrawal", "amount": 2000000}' -H 'Content-Type: application/json' -H 'Authorization: Token 5fbbd05f74991a739dad591f6bf6ad737d651365'
+Note: Choose account with balance less than the withdrawal amount
+
+8. View Transactions using admin access:
+curl -X GET http://127.0.0.1:13000/transactions/ -H 'Content-Type: application/json' -H 'Authorization: Token 5fbbd05f74991a739dad591f6bf6ad737d651365'
