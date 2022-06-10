@@ -1,0 +1,53 @@
+API Quick Guide:
+
+Note: replace data with correct data.
+
+1. Create user:
+curl -X POST http://127.0.0.1:13000/register/ -d '{"username": "janedoe", "password": "2020flex", "first_name": "Jane", "last_name": "Doe"}' -H "Content-Type: application/json"
+
+
+2. Get user authorization token:
+curl -X POST -d '{"username": "janedoe","password": "2020flex"}' -H 'Content-Type: application/json'  http://127.0.0.1:13000/api-token-auth/
+
+
+3. Login user:
+curl -X GET http://127.0.0.1:13000/api-auth/login/ -H 'Authorization: Token 2f13ca9b6f70305b6ac83021634b179dc976342b'
+
+
+4. List all users:
+curl -X GET http://127.0.0.1:13000/users/ -H 'Authorization: Token 5fbbd05f74991a739dad591f6bf6ad737d651365'
+
+
+5. Open account for user using admin access:
+curl -X POST http://127.0.0.1:13000/accounts/ -d '{"holder": 45, "account_type": "Credit", "balance": -1000}' -H 'Content-Type: application/json' -H 'Authorization: Token d934874c3ca9be2d3105c7d08762d8dfc0a31c88'
+
+
+6. List all account using admin access:
+curl -X GET http://127.0.0.1:13000/accounts/ -H 'Authorization: Token 5fbbd05f74991a739dad591f6bf6ad737d651365'
+
+
+7. List account by user id using admin access:
+curl -X GET http://127.0.0.1:13000/accounts/?user_id=45 -H 'Authorization: Token d934874c3ca9be2d3105c7d08762d8dfc0a31c88'
+
+
+8. Deposit into credit account using admin access:
+curl -X POST http://127.0.0.1:13000/transactions/ -d '{"account": 8, "transaction_type": "Deposit", "amount": 4000}' -H 'Content-Type: application/json' -H 'Authorization: Token 5fbbd05f74991a739dad591f6bf6ad737d651365'
+
+
+9. Withdraw from Savings account using admin access:
+curl -X POST http://127.0.0.1:13000/transactions/ -d '{"account": 8, "transaction_type": "Withdrawal", "amount": 4000}' -H 'Content-Type: application/json' -H 'Authorization: Token 5fbbd05f74991a739dad591f6bf6ad737d651365'
+
+
+10. View Transactions using admin access:
+curl -X GET http://127.0.0.1:13000/transactions/ -H 'Content-Type: application/json' -H 'Authorization: Token 5fbbd05f74991a739dad591f6bf6ad737d651365'
+
+
+11. User view own account:
+curl -X GET http://127.0.0.1:13000/user-account/ -H 'Authorization: Token 4318d0eb5adbbe5dda7530ed45374fa4bfe646e8'
+
+12 User view own account detail
+curl -X GET http://127.0.0.1:13000/user-account-detail/27/ -H 'Authorization: Token 4318d0eb5adbbe5dda7530ed45374fa4bfe646e8'
+
+13. Export Accounts in CSV
+1. Login as admin staff: http://127.0.0.1:13000/admin/
+2. Visit export view: http://127.0.0.1:13000/export-accounts/

@@ -15,7 +15,7 @@
 - pip install -r requirements.txt
 
 ### Create app security key
-- Create .env file inside /bank_api/bank_api
+- Create .env file inside /bank_api
 - Create security key
 - Or paste this instead SECRET_KEY=django-insecure-zf@gpw2t&ri#uw7@d8^#&#nkdpawfouz9dj^p*ii$mz-412jpm
 
