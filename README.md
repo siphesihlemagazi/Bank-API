@@ -16,8 +16,11 @@
 
 ### Create app security key
 - Create .env file inside /bank_api
-- Create security key
-- Or paste this instead SECRET_KEY=django-insecure-zf@gpw2t&ri#uw7@d8^#&#nkdpawfouz9dj^p*ii$mz-412jpm
+- Run this code to generate key:
+`from django.core.management.utils import get_random_secret_key
+print(get_random_secret_key())`[_code snippet_ source](https://www.educative.io/answers/how-to-generate-a-django-secretkey)
+- Paste your secret key in your .env file:
+`SECRET_KEY=your-secrete-key`
 
 ## Run migrations:
 - python manage.py makemigrations
@@ -28,7 +31,7 @@
 
 ## Create admin user
 - python manage.py createsuperuser 
-- details: user=admin, pass=2020flex
+- details: user=admin, password=password
 
 ## Start development server
 - python manage.py runserver 13000

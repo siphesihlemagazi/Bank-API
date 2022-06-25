@@ -24,10 +24,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         fake = Faker()
         fake.add_provider(Provider)
+
         for _ in range(100):
             user = fake.name()
             User.objects.create_user(username=user.replace(' ', '').lower(), first_name=user.split()[0],
-                                     last_name=user.split()[1], password='2020flex')
+                                     last_name=user.split()[1], password='password')
 
         for _ in range(100):
             acc_type = fake.get_account_type()
